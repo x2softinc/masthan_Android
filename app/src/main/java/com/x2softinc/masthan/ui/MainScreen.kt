@@ -242,8 +242,8 @@ private fun DrawerContent(
                     Icon(Icons.Filled.Close, "Close", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            Text("Prayer Times", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            Text("Islamic App", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(AppMetadata.appName(context), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(AppMetadata.APP_TAGLINE, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         HorizontalDivider()
 

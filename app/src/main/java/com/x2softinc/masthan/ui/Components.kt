@@ -80,7 +80,7 @@ fun UserFriendlyErrorDialog(error: UserFriendlyError?, onDismiss: () -> Unit) {
                             onDismiss()
                         }
                         RecoveryAction.Contact -> {
-                            openUrl(context, "mailto:support@alburoojiqama.com")
+                            openUrl(context, "mailto:support@x2softinc.com")
                             onDismiss()
                         }
                         RecoveryAction.None -> onDismiss()

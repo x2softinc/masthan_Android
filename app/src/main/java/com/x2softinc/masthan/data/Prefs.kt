@@ -62,7 +62,7 @@ fun getDeviceCode(): String {
 fun getBaseUrl(): String {
     var baseUrl = Prefs.getString(BASE_URL)
     if (baseUrl.isEmpty()) {
-        baseUrl = "http://masjidpro.x2softinc.com"
+        baseUrl = "https://masjidpro.x2softinc.com"
         Prefs.putString(BASE_URL, baseUrl)
     }
     return baseUrl

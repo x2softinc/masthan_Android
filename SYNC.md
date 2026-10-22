@@ -4,7 +4,7 @@ The iOS app lives in [`x2softinc/Masthan`](https://github.com/x2softinc/Masthan)
 This repo is its Android port (Kotlin/Jetpack Compose). **The Masthan repo is the source of
 truth and is never modified from here** - changes flow one way, Masthan -> Android.
 
-Last synced Masthan commit: `24f2bffc5db80344a5a30f8e9fe3e1c78816cae0`
+Last synced Masthan commit: `65cd85fe9df93559b5df199a9570d625827009f6`
 
 ## Workflow
 
@@ -30,7 +30,7 @@ Last synced Masthan commit: `24f2bffc5db80344a5a30f8e9fe3e1c78816cae0`
 | `Tools+Items/Dates+Functions.swift` | `util/DateFunctions.kt` |
 | `Services/AuthService.swift` | `data/AuthService.kt`, `data/Http.kt` |
 | request/retry logic repeated in each `Services/*Service.swift` | `data/ApiClient.kt` |
-| `Services/{Masjid,PrayerSettings,TimeDelay,IqamaTimes,AdhanTimes,Version}Service.swift` | `data/*Service.kt` |
+| `Services/{Masjid,PrayerSettings,TimeDelay,IqamaTimes,AnnualTimes,AdhanTimes,Version}Service.swift` | `data/*Service.kt` (`AnnualTimesService.swift` is a copy of `IqamaTimesService.swift`) |
 | `Services/AppVersionGate.swift` | `ui/AppVersionGate.kt` |
 | `Managers/LocationManager.swift` | `data/LocationTracker.kt` |
 | `Managers/NotificationScheduler.swift` | `notifications/*.kt` |
@@ -44,7 +44,7 @@ Last synced Masthan commit: `24f2bffc5db80344a5a30f8e9fe3e1c78816cae0`
 | `Views/PrayerSettingsView.swift` | `ui/PrayerSettingsScreen.kt` |
 | `Views/EULAView.swift` | `ui/EulaScreen.kt` |
 | `Views/LegalDocumentView.swift` | `ui/LegalDocumentScreen.kt` |
-| `*.mp3` adhan sounds | `res/raw/<lowercase name>.mp3` |
+| `Audio/*.mp3` adhan sounds (moved from `Masthan/` in 65cd85f) | `res/raw/<lowercase name>.mp3` |
 | `Assets.xcassets` compass images | `res/drawable[-night]/` |
 | `AppIcon.appiconset` | `res/mipmap-*/ic_launcher_foreground.png` (cleaned artwork) + adaptive icon XML; monochrome / notification icons are the vector mosque glyph |
 
@@ -54,7 +54,7 @@ Last synced Masthan commit: `24f2bffc5db80344a5a30f8e9fe3e1c78816cae0`
   code that no longer compiles against the current models (the iOS app does not use it).
 - `Views/CalendarView.swift` - disabled in the iOS tab bar (commented out in `ContentView.swift`).
 - Calendar and embedded map are not wanted on Android (decided by the owner).
-- `*.caf` sounds, the `" 2"` duplicate asset files, `.xcodeproj`, `Info.plist` (ATS exception ->
+- `AudioResource.swift` (iOS bundle lookup helper), `VERSION_API_KEY` in `Info.plist` (secret; set it in `local.properties` instead), `*.caf` sounds, the `" 2"` duplicate asset files, `.xcodeproj`, `Info.plist` (ATS exception ->
   `res/xml/network_security_config.xml`), `PrivacyInfo.xcprivacy`.
 - The dead `PrayerCardView` / `prayerRows` / `jummaSection` code in `DashboardView.swift`.
 
@@ -62,7 +62,7 @@ Last synced Masthan commit: `24f2bffc5db80344a5a30f8e9fe3e1c78816cae0`
 
 - **Maps**: iOS embeds an Apple Maps view. Android intentionally has no map; it shows the coordinates and
   opens the user's maps app for directions.
-- **App code**: the version check uses `MGMKAND1` on Android (iOS: `MGMKIOS1` once updated; currently `ALBIOS1`).
+- **App code**: the version check uses `MGMKAND1` on Android (iOS: `MGMKIOS1`).
 - **Notifications**: iOS uses repeating calendar triggers. Android schedules one exact alarm per
   prayer and re-schedules the next day (with that day's recalculated time) after each fires.
 - **Adhan sound**: Android notification-channel sounds are immutable, so each sound gets its own channel.

@@ -13,6 +13,15 @@ object AppMetadata {
         context.applicationInfo.loadLabel(context.packageManager).toString()
             .ifBlank { "Masthan Gani Masjid" }
 
+    /** Short display name for the app (e.g. "Masjid" instead of the full name). */
+    fun appShortName(context: Context): String {
+        val name = appName(context)
+        return if (name.contains("Masjid")) "Masjid" else name
+    }
+
+    /** Tagline or subtitle for the app. */
+    const val APP_TAGLINE = "Prayer Times & Community"
+
     fun appVersion(context: Context): String = packageInfo(context)?.versionName ?: "1.0"
 
     @Suppress("DEPRECATION")

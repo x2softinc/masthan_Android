@@ -25,6 +25,6 @@ VERSION_API_KEY=...
 ## Configuration
 
 - Package `com.x2softinc.masthan`, minSdk 26, targetSdk 35, version 2.0 (matches iOS `MARKETING_VERSION`).
-- App code for the version check: `MGMKAND1` (iOS app code will be `MGMKIOS1`; it currently still says `ALBIOS1`), see `SecureConfiguration` in `data/VersionService.kt`.
-- API base URL / device code defaults are in `data/Prefs.kt` (same values as iOS).
-- The API is plain HTTP on `x2softinc.com`; `res/xml/network_security_config.xml` allows cleartext for that domain only.
+- App code for the version check: `MGMKAND1` (iOS uses `MGMKIOS1`), see `SecureConfiguration` in `data/VersionService.kt`.
+- API base URL / device code defaults are in `data/Prefs.kt` (same values as iOS; the default URL is HTTPS).
+- `res/xml/network_security_config.xml` still allows cleartext for `x2softinc.com` in case the server's `overrideURL` points at an HTTP host; remove it if that never happens.

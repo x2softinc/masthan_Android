@@ -15,10 +15,10 @@ object MasjidProApiPaths {
     }
 
     object OAuth {
-        const val AUTHORIZE_PKCE = "/oauth/authorize-pkce"
-        const val AUTHORIZE_PKCE_DEVICE_CODE = "/oauth/authorize-pkce-deviceCode"
-        const val TOKEN = "/oauth/token"
-        const val CLIENTS = "/oauth/clients"
+        const val AUTHORIZE_PKCE = "/api/oauth/authorize-pkce"
+        const val AUTHORIZE_PKCE_DEVICE_CODE = "/api/oauth/authorize-pkce-deviceCode"
+        const val TOKEN = "/api/oauth/token"
+        const val CLIENTS = "/api/oauth/clients"
     }
 
     object Device {
