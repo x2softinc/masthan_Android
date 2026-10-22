@@ -54,7 +54,7 @@ Last synced Masthan commit: `65cd85fe9df93559b5df199a9570d625827009f6`
   code that no longer compiles against the current models (the iOS app does not use it).
 - `Views/CalendarView.swift` - disabled in the iOS tab bar (commented out in `ContentView.swift`).
 - Calendar and embedded map are not wanted on Android (decided by the owner).
-- `AudioResource.swift` (iOS bundle lookup helper), `VERSION_API_KEY` in `Info.plist` (secret; set it in `local.properties` instead), `*.caf` sounds, the `" 2"` duplicate asset files, `.xcodeproj`, `Info.plist` (ATS exception ->
+- `AudioResource.swift` (iOS bundle lookup helper), `VERSION_API_KEY` in `Info.plist` (secret; set `VERSION_API_KEY` in the git-ignored `local.properties`), `*.caf` sounds, the `" 2"` duplicate asset files, `.xcodeproj`, `Info.plist` (ATS exception ->
   `res/xml/network_security_config.xml`), `PrivacyInfo.xcprivacy`.
 - The dead `PrayerCardView` / `prayerRows` / `jummaSection` code in `DashboardView.swift`.
 

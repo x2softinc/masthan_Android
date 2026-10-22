@@ -7,13 +7,14 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-// Secrets stay out of source control: put VERSION_API_KEY=... in local.properties
-// (or export it as an environment variable). Mirrors the iOS Info.plist VERSION_API_KEY.
+// VERSION_API_KEY mirrors the iOS Info.plist key. Lookup order: local.properties (git-ignored),
+// ~/.gradle/gradle.properties, then the VERSION_API_KEY environment variable.
 val localProps = Properties().apply {
     val f = rootProject.file("local.properties")
     if (f.exists()) f.inputStream().use { load(it) }
 }
 val versionApiKey: String = localProps.getProperty("VERSION_API_KEY")
+    ?: providers.gradleProperty("VERSION_API_KEY").orNull
     ?: System.getenv("VERSION_API_KEY")
     ?: ""
 
