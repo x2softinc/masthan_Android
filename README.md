@@ -13,7 +13,7 @@ Requirements: JDK 17+, Android SDK (API 35). Create `local.properties` (git-igno
 
 ```properties
 sdk.dir=/path/to/Android/sdk
-# Optional: API key for the app-version check (iOS keeps it in Info.plist as VERSION_API_KEY)
+# API key for the app-version check (iOS keeps it in Info.plist as VERSION_API_KEY)
 VERSION_API_KEY=...
 ```
 
@@ -25,5 +25,6 @@ VERSION_API_KEY=...
 ## Configuration
 
 - Package `com.x2softinc.masthan`, minSdk 26, targetSdk 35, version 2.0 (matches iOS `MARKETING_VERSION`).
+- App code for the version check: `MGMKAND1` (iOS app code will be `MGMKIOS1`; it currently still says `ALBIOS1`), see `SecureConfiguration` in `data/VersionService.kt`.
 - API base URL / device code defaults are in `data/Prefs.kt` (same values as iOS).
 - The API is plain HTTP on `x2softinc.com`; `res/xml/network_security_config.xml` allows cleartext for that domain only.

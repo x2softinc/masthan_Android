@@ -46,20 +46,23 @@ Last synced Masthan commit: `24f2bffc5db80344a5a30f8e9fe3e1c78816cae0`
 | `Views/LegalDocumentView.swift` | `ui/LegalDocumentScreen.kt` |
 | `*.mp3` adhan sounds | `res/raw/<lowercase name>.mp3` |
 | `Assets.xcassets` compass images | `res/drawable[-night]/` |
+| `AppIcon.appiconset` | `res/mipmap-*/ic_launcher_foreground.png` (cleaned artwork) + adaptive icon XML; monochrome / notification icons are the vector mosque glyph |
 
 ## Deliberately not ported
 
 - `Services/AdhanIqamaService.swift`, `Services/NotificationService.swift` - legacy CoreData/JavaScriptCore
   code that no longer compiles against the current models (the iOS app does not use it).
 - `Views/CalendarView.swift` - disabled in the iOS tab bar (commented out in `ContentView.swift`).
+- Calendar and embedded map are not wanted on Android (decided by the owner).
 - `*.caf` sounds, the `" 2"` duplicate asset files, `.xcodeproj`, `Info.plist` (ATS exception ->
   `res/xml/network_security_config.xml`), `PrivacyInfo.xcprivacy`.
 - The dead `PrayerCardView` / `prayerRows` / `jummaSection` code in `DashboardView.swift`.
 
 ## Intentional platform differences
 
-- **Maps**: iOS embeds an Apple Maps view. Android shows the coordinates and opens the user's maps
-  app for directions (no Google Maps API key needed).
+- **Maps**: iOS embeds an Apple Maps view. Android intentionally has no map; it shows the coordinates and
+  opens the user's maps app for directions.
+- **App code**: the version check uses `MGMKAND1` on Android (iOS: `MGMKIOS1` once updated; currently `ALBIOS1`).
 - **Notifications**: iOS uses repeating calendar triggers. Android schedules one exact alarm per
   prayer and re-schedules the next day (with that day's recalculated time) after each fires.
 - **Adhan sound**: Android notification-channel sounds are immutable, so each sound gets its own channel.

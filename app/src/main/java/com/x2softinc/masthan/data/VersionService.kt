@@ -11,7 +11,7 @@ object SecureConfiguration {
     val versionApiKey: String get() = BuildConfig.VERSION_API_KEY
 
     /** Version check URL (HTTPS only). */
-    const val VERSION_CHECK_URL = "https://nexus.x2softinc.com/api/v1/apps/by-code/ALBIOS1"
+    const val VERSION_CHECK_URL = "https://nexus.x2softinc.com/api/v1/apps/by-code/MGMKAND1"
 }
 
 open class VersionService(private val context: Context) {

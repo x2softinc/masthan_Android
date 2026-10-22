@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="splash_background">#25614D</color>
+    <!-- Matches the dark edge of the launcher artwork so the adaptive icon blends seamlessly. -->
+    <color name="ic_launcher_background">#190800</color>
 </resources>
