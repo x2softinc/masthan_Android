@@ -144,14 +144,15 @@ fun MainScreen() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                                        title = { Text(current.barTitle, color = BarContentColor, fontWeight = FontWeight.Bold) },
+                    modifier = Modifier.background(BarBrush),
+                    title = { Text(current.barTitle, color = BarContentColor, fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(Icons.Filled.Menu, "Menu", tint = BarContentColor)
                         }
                     },
                     actions = { if (current == Tab.DASHBOARD) DisplayCity() },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = BarColor),
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 )
             },
             bottomBar = {
@@ -208,11 +209,12 @@ private fun DetailScaffold(title: String, onBack: () -> Unit, content: @Composab
     Scaffold(
         topBar = {
             TopAppBar(
-                                title = { Text(title, color = BarContentColor, fontWeight = FontWeight.Bold) },
+                modifier = Modifier.background(BarBrush),
+                title = { Text(title, color = BarContentColor, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = BarContentColor) }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = BarColor),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             )
         },
     ) { padding -> Column(Modifier.padding(padding)) { content() } }

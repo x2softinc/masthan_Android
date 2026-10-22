@@ -12,6 +12,11 @@ import androidx.compose.ui.graphics.Color
 /** Navigation / toolbar background. */
 val BarColor = Color(0xFFC9963A)
 
+/** Warm gold sheen for the top bar: light champagne gold into deep amber gold. */
+val BarBrush = androidx.compose.ui.graphics.Brush.horizontalGradient(
+    listOf(Color(0xFFE3BE6B), Color(0xFFC9963A), Color(0xFFA8741F)),
+)
+
 /** Title / icon color on [BarColor]: dark brown, since white is unreadable on bright gold. */
 val BarContentColor = Color(0xFF2B1B00)
 
