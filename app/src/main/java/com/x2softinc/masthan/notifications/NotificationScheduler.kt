@@ -31,9 +31,12 @@ import com.x2softinc.masthan.data.AdhanSoundPreference
 import com.x2softinc.masthan.data.AdhanTimesService
 import com.x2softinc.masthan.data.AnnualTime
 import com.x2softinc.masthan.data.AppJson
+import com.x2softinc.masthan.data.IqamaCalculator
 import com.x2softinc.masthan.data.IqamaTime
 import com.x2softinc.masthan.data.IqamaTimesService
 import com.x2softinc.masthan.data.Prefs
+import com.x2softinc.masthan.data.TimeDelay
+import com.x2softinc.masthan.data.TimeDelayService
 import com.x2softinc.masthan.util.parseClockTime
 import com.x2softinc.masthan.util.today
 import kotlinx.coroutines.CancellationException
@@ -135,7 +138,8 @@ object NotificationScheduler {
 
         val today = today()
         val tomorrow = today.plusDays(1)
-        val days = listOf(todaysIqamaTimes(today), decodeIqamaTimes(tomorrow))
+        val delays = fetchTimeDelays()
+        val days = listOf(todaysIqamaTimes(today, delays), decodeIqamaTimes(tomorrow, delays))
 
         val now = System.currentTimeMillis()
         // Maghrib Iqama is intentionally left out of notifications.
@@ -154,8 +158,8 @@ object NotificationScheduler {
         }
     }
 
-    private suspend fun todaysIqamaTimes(today: ZonedDateTime): IqamaTime? {
-        decodeIqamaTimes(today)?.let { return it }
+    private suspend fun todaysIqamaTimes(today: ZonedDateTime, delays: TimeDelay?): IqamaTime? {
+        decodeIqamaTimes(today, delays)?.let { return it }
 
         // Try refreshing from the server only if today's schedule is not cached.
         try {
@@ -165,10 +169,20 @@ object NotificationScheduler {
         } catch (e: Exception) {
             // Fall back to whatever annual times are already stored.
         }
-        return decodeIqamaTimes(today)
+        return decodeIqamaTimes(today, delays)
     }
 
-    private fun decodeIqamaTimes(day: ZonedDateTime): IqamaTime? {
+    /** Per-prayer Iqama delays (cached daily by the service); null falls back to defaults. */
+    private suspend fun fetchTimeDelays(): TimeDelay? = try {
+        TimeDelayService().fetchTimeDelay()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        null
+    }
+
+    /** Iqama = rounded masjid adhan time + delay, matching the Dashboard. */
+    private fun decodeIqamaTimes(day: ZonedDateTime, delays: TimeDelay?): IqamaTime? {
         val raw = Prefs.getString(ANNUAL_TIMES)
         if (raw.isEmpty()) return null
         val records = runCatching {
@@ -181,13 +195,14 @@ object NotificationScheduler {
             it.month == month && (it.fromDay ?: 0) <= dom && (it.toDay ?: 0) >= dom
         } ?: return null
 
-        return IqamaTime(
-            fajr = parseClockTime(record.fajrTime, day),
-            dhuhar = parseClockTime(record.dhuharTime, day),
-            asar = parseClockTime(record.asrTime, day),
-            // Maghrib is intentionally not used for Iqama notifications.
-            isha = parseClockTime(record.ishaTime, day),
+        val adhan = IqamaTime(
+            fajr = IqamaCalculator.roundUp(parseClockTime(record.fajrTime, day)),
+            dhuhar = IqamaCalculator.roundUp(parseClockTime(record.dhuharTime, day)),
+            asar = IqamaCalculator.roundUp(parseClockTime(record.asrTime, day)),
+            isha = IqamaCalculator.roundUp(parseClockTime(record.ishaTime, day)),
         )
+        // Maghrib Iqama is intentionally not used for notifications.
+        return IqamaCalculator.iqamaFrom(adhan, delays)
     }
 
     // endregion

@@ -14,6 +14,7 @@ import com.x2softinc.masthan.data.AdhanTime
 import com.x2softinc.masthan.data.AdhanTimesService
 import com.x2softinc.masthan.data.AnnualTime
 import com.x2softinc.masthan.data.AppJson
+import com.x2softinc.masthan.data.IqamaCalculator
 import com.x2softinc.masthan.data.IqamaTime
 import com.x2softinc.masthan.data.IqamaTimesService
 import com.x2softinc.masthan.data.PrayerSetting
@@ -29,7 +30,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.builtins.ListSerializer
 import java.time.Duration
 import java.time.ZonedDateTime
-import kotlin.math.ceil
 
 /** The prayer window the current time falls in. */
 data class CurrentPrayer(val name: String, val adhan: ZonedDateTime, val iqama: ZonedDateTime)
@@ -148,25 +148,12 @@ class TimesViewModel : ViewModel() {
 
         // These are ADHAN times from the API (not iqama) - rounded up per the round-minutes setting.
         masjidAdhanTimes = IqamaTime(
-            fajr = roundUp(parseClockTime(row?.fajrTime, date)),
-            dhuhar = roundUp(parseClockTime(row?.dhuharTime, date)),
-            asar = roundUp(parseClockTime(row?.asrTime, date)),
-            maghrib = roundUp(parseClockTime(row?.maghribTime, date)),
-            isha = roundUp(parseClockTime(row?.ishaTime, date)),
+            fajr = IqamaCalculator.roundUp(parseClockTime(row?.fajrTime, date)),
+            dhuhar = IqamaCalculator.roundUp(parseClockTime(row?.dhuharTime, date)),
+            asar = IqamaCalculator.roundUp(parseClockTime(row?.asrTime, date)),
+            maghrib = IqamaCalculator.roundUp(parseClockTime(row?.maghribTime, date)),
+            isha = IqamaCalculator.roundUp(parseClockTime(row?.ishaTime, date)),
         )
-    }
-
-    /** Rounds a time UP (ceil) to the next interval based on the round-minutes setting. */
-    private fun roundUp(time: ZonedDateTime?): ZonedDateTime? {
-        time ?: return null
-        val interval = roundMinutes
-        if (interval <= 0) return time // No rounding if 0
-
-        val minute = time.minute
-        val roundedMinute = (ceil(minute.toDouble() / interval) * interval).toInt()
-        val base = time.withMinute(0).withSecond(0).withNano(0)
-        // Handle hour overflow if the minute was rounded to 60 or higher.
-        return if (roundedMinute >= 60) base.plusHours(1) else base.withMinute(roundedMinute)
     }
 
     // endregion
@@ -176,21 +163,7 @@ class TimesViewModel : ViewModel() {
     private fun calculateIqamaTimes() {
         iqamaTimes = IqamaTime()
         val adhan = masjidAdhanTimes ?: return
-
-        // Use fetched time delays, with fallback to 20 minutes if not available
-        val fajrDelay = timeDelays?.fajr ?: 20
-        val dhuharDelay = timeDelays?.dhuhar ?: 20
-        val asarDelay = timeDelays?.asr ?: 20
-        val ishaDelay = timeDelays?.isha ?: 20
-
-        iqamaTimes = IqamaTime(
-            fajr = adhan.fajr?.plusMinutes(fajrDelay.toLong()),
-            dhuhar = adhan.dhuhar?.plusMinutes(dhuharDelay.toLong()),
-            asar = adhan.asar?.plusMinutes(asarDelay.toLong()),
-            // Maghrib: use the special delay from settings
-            maghrib = adhan.maghrib?.plusMinutes(maghribDelayMinutes.toLong()),
-            isha = adhan.isha?.plusMinutes(ishaDelay.toLong()),
-        )
+        iqamaTimes = IqamaCalculator.iqamaFrom(adhan, timeDelays)
     }
 
     // endregion
