@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adhan sounds are resolved by name at runtime (Resources.getIdentifier), so resource
+     shrinking must not treat them as unused. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@raw/*" />

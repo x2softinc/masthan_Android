@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Equivalent of the iOS NSAppTransportSecurity exception for x2softinc.com
+     (the Masjid Pro API is served over plain HTTP). -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">x2softinc.com</domain>
+    </domain-config>
+</network-security-config>
