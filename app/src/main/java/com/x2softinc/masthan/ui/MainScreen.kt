@@ -144,10 +144,10 @@ fun MainScreen() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(current.barTitle, color = Color.White) },
+                                        title = { Text(current.barTitle, color = BarContentColor, fontWeight = FontWeight.Bold) },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Filled.Menu, "Menu", tint = Color.White)
+                            Icon(Icons.Filled.Menu, "Menu", tint = BarContentColor)
                         }
                     },
                     actions = { if (current == Tab.DASHBOARD) DisplayCity() },
@@ -195,8 +195,8 @@ private fun DisplayCity() {
     if (displayCity.isNotEmpty()) {
         Text(
             displayCity,
-            color = Color.White,
-            fontWeight = FontWeight.Medium,
+            color = BarContentColor,
+            fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(end = 12.dp),
         )
@@ -208,9 +208,9 @@ private fun DetailScaffold(title: String, onBack: () -> Unit, content: @Composab
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(title, color = Color.White) },
+                                title = { Text(title, color = BarContentColor, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White) }
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = BarContentColor) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = BarColor),
             )

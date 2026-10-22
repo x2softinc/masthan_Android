@@ -168,12 +168,16 @@ private fun MasjidCard(info: MasjidInfo, isTablet: Boolean) {
 
                 Button(
                     onClick = { openDirections(context, info.latitude, info.longitude, info.masjidName ?: "Masjid") },
-                    colors = ButtonDefaults.buttonColors(containerColor = AccentColor, contentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(containerColor = BarColor, contentColor = BarContentColor),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(Icons.Filled.DirectionsCar, null, Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Driving Directions", style = if (isTablet) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleSmall)
+                    Text(
+                        "Driving Directions",
+                        style = if (isTablet) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                    )
                 }
             }
         }

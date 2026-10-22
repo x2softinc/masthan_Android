@@ -119,7 +119,8 @@ fun QiblaScreen() {
 
     LaunchedEffect(alignmentError) {
         val wasLocked = isLocked
-        isLocked = alignmentError <= 3.0 // tolerance in degrees
+        // Hysteresis: easier to stay locked than to lock, so hand tremor doesn't flicker it.
+        isLocked = if (wasLocked) alignmentError <= 8.0 else alignmentError <= 4.0 // degrees
         // Light haptic when entering the lock state, throttled to 1 per 0.8s
         if (isLocked && !wasLocked) {
             val now = System.currentTimeMillis()
@@ -244,7 +245,7 @@ private fun QiblaCompass(faceRotation: Float, needleRotation: Float, isLocked: B
                     )
                 }
             }
-            // Cardinal and intercardinal labels, upright along the radius.
+            // Cardinal and intercardinal labels, kept upright on screen.
             val labels = listOf("N" to 0, "NE" to 45, "E" to 90, "SE" to 135, "S" to 180, "SW" to 225, "W" to 270, "NW" to 315)
             for ((text, deg) in labels) {
                 val cardinal = text.length == 1
@@ -254,8 +255,12 @@ private fun QiblaCompass(faceRotation: Float, needleRotation: Float, isLocked: B
                     fontWeight = FontWeight.Bold,
                 )
                 val m = measurer.measure(text, style)
-                rotate(deg.toFloat(), c) {
-                    drawText(m, topLeft = Offset(c.x - m.size.width / 2f, c.y - r + 34f * dp))
+                // Place on the dial, then counter-rotate so the text always reads upright.
+                val rad = Math.toRadians(deg.toDouble())
+                val labelRadius = r - 46f * dp
+                val at = Offset(c.x + (labelRadius * sin(rad)).toFloat(), c.y - (labelRadius * cos(rad)).toFloat())
+                rotate(-faceRotation, at) {
+                    drawText(m, topLeft = Offset(at.x - m.size.width / 2f, at.y - m.size.height / 2f))
                 }
             }
             // North marker.

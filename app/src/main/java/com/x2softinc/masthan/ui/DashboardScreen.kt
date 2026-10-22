@@ -438,9 +438,13 @@ private fun PrayerTableRow(
         // Iqama time column
         Box(Modifier.weight(1f).padding(top = rowPadding, bottom = rowPadding, end = 12.dp), contentAlignment = Alignment.Center) {
             if (iqama != null) {
+                // Tinted pill + heavier, full-strength text so Iqama stands out against white.
                 Text(
-                    formatTime(iqama), fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                    color = if (isCurrent) theme else theme.copy(alpha = 0.8f),
+                    formatTime(iqama), fontSize = 17.sp, fontWeight = FontWeight.ExtraBold,
+                    color = theme,
+                    modifier = Modifier
+                        .background(theme.copy(alpha = if (isCurrent) 0.2f else 0.12f), RoundedCornerShape(10.dp))
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
                 )
             } else {
                 Text("—", fontSize = 16.sp, color = secondary)

@@ -23,6 +23,7 @@ import com.x2softinc.masthan.CITY
 import com.x2softinc.masthan.LATT
 import com.x2softinc.masthan.LONG
 import java.util.Locale
+import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -39,6 +40,8 @@ data class Heading(val trueHeading: Double?, val magneticHeading: Double)
 object LocationTracker {
     private const val REQUESTED_KEY = "locationPermissionRequested"
     private const val REGEOCODE_DISTANCE_M = 1000f
+    private const val SMOOTHING_ALPHA = 0.08 // lower = steadier, slower to follow
+    private const val UPRIGHT_THRESHOLD = 0.6f // |cos| of tilt from flat below which the phone is upright
 
     var authorization by mutableStateOf(LocationAuthorization.NOT_DETERMINED)
         private set
@@ -141,11 +144,19 @@ object LocationTracker {
 
     private val sensorListener = object : SensorEventListener {
         private val rotation = FloatArray(9)
+        private val remapped = FloatArray(9)
         private val orientation = FloatArray(3)
 
         override fun onSensorChanged(event: SensorEvent) {
             SensorManager.getRotationMatrixFromVector(rotation, event.values)
-            SensorManager.getOrientation(rotation, orientation)
+            // Held upright (the usual way to point at a Qibla), azimuth about the Z axis goes
+            // unstable; use the direction the back of the phone faces instead.
+            if (abs(rotation[8]) < UPRIGHT_THRESHOLD) {
+                SensorManager.remapCoordinateSystem(rotation, SensorManager.AXIS_X, SensorManager.AXIS_Z, remapped)
+                SensorManager.getOrientation(remapped, orientation)
+            } else {
+                SensorManager.getOrientation(rotation, orientation)
+            }
             val azimuth = Math.toDegrees(orientation[0].toDouble())
             val magnetic = (azimuth + 360.0) % 360.0
 
@@ -154,7 +165,7 @@ object LocationTracker {
             if (!hasSmoothed) {
                 smoothedSin = sin(rad); smoothedCos = cos(rad); hasSmoothed = true
             } else {
-                val alpha = 0.2
+                val alpha = SMOOTHING_ALPHA
                 smoothedSin += alpha * (sin(rad) - smoothedSin)
                 smoothedCos += alpha * (cos(rad) - smoothedCos)
             }
