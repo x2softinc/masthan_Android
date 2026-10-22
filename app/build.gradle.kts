@@ -20,12 +20,12 @@ val versionApiKey: String = localProps.getProperty("VERSION_API_KEY")
 
 android {
     namespace = "com.x2softinc.masthan"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.x2softinc.masthan"
-        minSdk = 26
-        targetSdk = 35
+        minSdk = 30
+        targetSdk = 37
         versionCode = 1
         versionName = "2.0"
 
@@ -51,10 +51,12 @@ android {
         compose = true
         buildConfig = true
     }
+    compileSdkMinor = 0
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

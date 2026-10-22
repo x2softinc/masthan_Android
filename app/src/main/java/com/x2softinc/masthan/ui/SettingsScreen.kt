@@ -4,6 +4,9 @@ import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
@@ -22,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Description
@@ -62,6 +66,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.x2softinc.masthan.APP_URL
 import com.x2softinc.masthan.AUTH_TOKEN
 import com.x2softinc.masthan.AppMetadata
@@ -149,7 +155,13 @@ fun SettingsScreen(onOpenAdhanSound: () -> Unit, onOpenTerms: () -> Unit, onOpen
         }
     }
 
-    LaunchedEffect(Unit) { NotificationScheduler.syncNotifications(context) }
+    var exactAlarmsAllowed by remember { mutableStateOf(NotificationScheduler.canScheduleExactAlarms(context)) }
+
+    // Also covers returning from the system "Alarms & reminders" page.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        exactAlarmsAllowed = NotificationScheduler.canScheduleExactAlarms(context)
+        sync()
+    }
 
     val isConnected = authToken.isNotEmpty() && tokenExpiry.isNotEmpty() && !AuthService().isAuthTokenExpired()
     val appName = AppMetadata.appName(context)
@@ -211,6 +223,10 @@ fun SettingsScreen(onOpenAdhanSound: () -> Unit, onOpenTerms: () -> Unit, onOpen
                     notifyIqama = it
                     sync()
                 }
+                if (notificationsEnabled && !exactAlarmsAllowed) {
+                    HorizontalDivider()
+                    ActionRow(Icons.Filled.Alarm, "Allow Exact Alarms") { openExactAlarmSettings(context) }
+                }
                 HorizontalDivider()
                 val soundEnabled = notificationsEnabled && notifyAdhan
                 Row(
@@ -228,7 +244,7 @@ fun SettingsScreen(onOpenAdhanSound: () -> Unit, onOpenTerms: () -> Unit, onOpen
                 }
             }
         }
-        item { SectionFooter("The selected sound is used only for Adhan notifications. Iqama notifications keep the default system sound.") }
+        item { SectionFooter("The selected sound is used only for Adhan notifications. Iqama notifications keep the default system sound. Exact alarms keep reminders on time; without them Android may delay them by several minutes.") }
 
         // App access
         item { SectionHeader(Icons.Filled.Lock, "App Access") }
@@ -304,6 +320,13 @@ fun SettingsScreen(onOpenAdhanSound: () -> Unit, onOpenTerms: () -> Unit, onOpen
         )
         null -> Unit
     }
+}
+
+private fun openExactAlarmSettings(context: Context) {
+    if (Build.VERSION.SDK_INT < 31) return
+    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    runCatching { context.startActivity(intent) }.onFailure { openAppSettings(context) }
 }
 
 private fun formattedLocation(city: String, latitude: Double, longitude: Double): String = when {

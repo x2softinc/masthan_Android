@@ -89,6 +89,11 @@ object NotificationScheduler {
         return NotificationManagerCompat.from(context).areNotificationsEnabled()
     }
 
+    /** False on Android 12+ until the user grants "Alarms & reminders"; alarms are then inexact. */
+    fun canScheduleExactAlarms(context: Context): Boolean =
+        Build.VERSION.SDK_INT < 31 ||
+            (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).canScheduleExactAlarms()
+
     // region Adhan
 
     private fun scheduleAdhan(context: Context) {
@@ -207,7 +212,7 @@ object NotificationScheduler {
         val alarms = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = pendingIntent(context, kind, prayer, city)
         val triggerAt = at.toInstant().toEpochMilli()
-        if (Build.VERSION.SDK_INT < 31 || alarms.canScheduleExactAlarms()) {
+        if (canScheduleExactAlarms(context)) {
             alarms.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, intent)
         } else {
             alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, intent)
