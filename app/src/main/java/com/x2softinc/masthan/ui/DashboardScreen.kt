@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -15,10 +16,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -58,6 +62,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -252,23 +257,35 @@ private fun DayPrayerPage(dayOffset: Int, pageDate: ZonedDateTime, timesVM: Time
                 }
             }
         } else {
-            Box(
-                Modifier.fillMaxWidth().weight(1f).padding(8.dp),
-                contentAlignment = if (isTabletFullScreen) Alignment.Center else Alignment.TopCenter,
-            ) {
-                PrayerTable(dayOffset, pageDate, timesVM, now)
+            // Scrolls when the table is taller than the window (e.g. landscape tablet with Jumma).
+            BoxWithConstraints(Modifier.fillMaxWidth().weight(1f).padding(8.dp)) {
+                val pageHeight = maxHeight
+                Column(
+                    Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = pageHeight),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = if (isTabletFullScreen) Arrangement.Center else Arrangement.Top,
+                ) {
+                    PrayerTable(dayOffset, pageDate, timesVM, now, availableHeight = pageHeight)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun PrayerTable(dayOffset: Int, pageDate: ZonedDateTime, timesVM: TimesViewModel, now: ZonedDateTime) {
+private fun PrayerTable(dayOffset: Int, pageDate: ZonedDateTime, timesVM: TimesViewModel, now: ZonedDateTime, availableHeight: Dp) {
     val jurisdiction by rememberIntPref(JURISDICTION)
     val theme = MaterialTheme.colorScheme.primary
     val current = if (dayOffset == 0) timesVM.currentPrayerInfo(now) else null
     val times = timesVM.adhanTimes
     val shape = RoundedCornerShape(16.dp)
+
+    // Shrink row padding (18dp down to 6dp) so every row fits the available height;
+    // the page still scrolls if even the minimum doesn't fit.
+    val rowCount = if (shouldShowJumma(pageDate, timesVM)) 7 else 6
+    val chromeHeight = 58.dp // header + divider + shadow margin
+    val contentHeight = 55.dp * rowCount - 18.dp // two-line rows incl. divider; sunrise has no "enters" line
+    val rowPadding = ((availableHeight - chromeHeight - contentHeight) / (2 * rowCount)).coerceIn(6.dp, 18.dp)
 
     Column(
         Modifier
@@ -298,22 +315,22 @@ private fun PrayerTable(dayOffset: Int, pageDate: ZonedDateTime, timesVM: TimesV
         }
         HorizontalDivider(color = Color.Gray.copy(alpha = 0.4f))
 
-        PrayerTableRow(FAJR, times.fajr, timesVM.masjidAdhanTimes?.fajr, timesVM.iqamaTimes?.fajr, isCurrent(FAJR, current), Icons.Filled.Bedtime)
+        PrayerTableRow(FAJR, times.fajr, timesVM.masjidAdhanTimes?.fajr, timesVM.iqamaTimes?.fajr, isCurrent(FAJR, current), Icons.Filled.Bedtime, rowPadding = rowPadding)
         RowDivider()
-        PrayerTableRow(SUNRISE, times.sunrise, null, null, isCurrent(SUNRISE, current), Icons.Filled.WbTwilight, isSpecial = true)
+        PrayerTableRow(SUNRISE, times.sunrise, null, null, isCurrent(SUNRISE, current), Icons.Filled.WbTwilight, isSpecial = true, rowPadding = rowPadding)
         RowDivider()
-        PrayerTableRow(DHUHAR, times.dhuhar, timesVM.masjidAdhanTimes?.dhuhar, timesVM.iqamaTimes?.dhuhar, isCurrent(DHUHAR, current), Icons.Filled.WbSunny)
+        PrayerTableRow(DHUHAR, times.dhuhar, timesVM.masjidAdhanTimes?.dhuhar, timesVM.iqamaTimes?.dhuhar, isCurrent(DHUHAR, current), Icons.Filled.WbSunny, rowPadding = rowPadding)
         RowDivider()
         PrayerTableRow(
             ASAR,
             if (jurisdiction != 0) times.asarHanafi else times.asar,
             timesVM.masjidAdhanTimes?.asar, timesVM.iqamaTimes?.asar,
-            isCurrent(ASAR, current), Icons.Filled.WbCloudy,
+            isCurrent(ASAR, current), Icons.Filled.WbCloudy, rowPadding = rowPadding,
         )
         RowDivider()
-        PrayerTableRow(MAGHRIB, times.maghrib, timesVM.masjidAdhanTimes?.maghrib, timesVM.iqamaTimes?.maghrib, isCurrent(MAGHRIB, current), Icons.Filled.Brightness4)
+        PrayerTableRow(MAGHRIB, times.maghrib, timesVM.masjidAdhanTimes?.maghrib, timesVM.iqamaTimes?.maghrib, isCurrent(MAGHRIB, current), Icons.Filled.Brightness4, rowPadding = rowPadding)
         RowDivider()
-        PrayerTableRow(ISHA, times.isha, timesVM.masjidAdhanTimes?.isha, timesVM.iqamaTimes?.isha, isCurrent(ISHA, current), Icons.Filled.NightsStay)
+        PrayerTableRow(ISHA, times.isha, timesVM.masjidAdhanTimes?.isha, timesVM.iqamaTimes?.isha, isCurrent(ISHA, current), Icons.Filled.NightsStay, rowPadding = rowPadding)
 
         // Jumma section if applicable
         if (shouldShowJumma(pageDate, timesVM)) {
@@ -321,7 +338,7 @@ private fun PrayerTable(dayOffset: Int, pageDate: ZonedDateTime, timesVM: TimesV
             PrayerTableRow(
                 JUMMA, times.dhuhar, timesVM.masjidAdhanTimes?.dhuhar,
                 parseSettingTime(timesVM.settings?.jumma, pageDate),
-                isCurrent = false, icon = Icons.Filled.Groups, isJumma = true,
+                isCurrent = false, icon = Icons.Filled.Groups, isJumma = true, rowPadding = rowPadding,
             )
         }
     }
@@ -352,6 +369,7 @@ private fun PrayerTableRow(
     icon: ImageVector,
     isJumma: Boolean = false,
     isSpecial: Boolean = false,
+    rowPadding: Dp = 18.dp,
 ) {
     val theme = MaterialTheme.colorScheme.primary
     val onSurface = MaterialTheme.colorScheme.onSurface
@@ -371,7 +389,7 @@ private fun PrayerTableRow(
 
         // Prayer name with icon and "enters" time
         Row(
-            Modifier.weight(1f).padding(start = 12.dp, top = 18.dp, bottom = 18.dp),
+            Modifier.weight(1f).padding(start = 12.dp, top = rowPadding, bottom = rowPadding),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -404,7 +422,7 @@ private fun PrayerTableRow(
         }
 
         // Adhan time column
-        Box(Modifier.weight(1f).padding(vertical = 18.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.weight(1f).padding(vertical = rowPadding), contentAlignment = Alignment.Center) {
             when {
                 adhan != null -> Text(
                     formatTime(adhan), fontSize = 16.sp,
@@ -418,7 +436,7 @@ private fun PrayerTableRow(
         }
 
         // Iqama time column
-        Box(Modifier.weight(1f).padding(top = 18.dp, bottom = 18.dp, end = 12.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.weight(1f).padding(top = rowPadding, bottom = rowPadding, end = 12.dp), contentAlignment = Alignment.Center) {
             if (iqama != null) {
                 Text(
                     formatTime(iqama), fontSize = 16.sp, fontWeight = FontWeight.Bold,

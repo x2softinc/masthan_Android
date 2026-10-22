@@ -8,6 +8,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -78,7 +81,7 @@ private const val KAABA_LONGITUDE = 39.8262
 @Composable
 fun QiblaScreen() {
     val isTablet = LocalConfiguration.current.screenWidthDp >= 600
-    val compassSize = if (isTablet) 440.dp else 340.dp
+    val preferredCompassSize = if (isTablet) 440.dp else 340.dp
     val haptics = LocalHapticFeedback.current
 
     var useTrueNorth by remember { mutableStateOf(true) }
@@ -131,8 +134,12 @@ fun QiblaScreen() {
     val rotationOfNeedle = rememberUnwrappedAngle(qiblaPointerRotation.toFloat())
     val lockScale by animateFloatAsState(if (isLocked) 1f else 0f, spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMedium), label = "lock")
 
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+    // Leave room for the status text, stats, alignment bar and toggle below the dial
+    // so short (e.g. landscape tablet) windows don't push them off-screen.
+    val compassSize = min(preferredCompassSize.value, (maxHeight - 250.dp).value.coerceAtLeast(200f)).dp
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(if (isTablet) 32.dp else 24.dp, Alignment.CenterVertically),
     ) {
@@ -199,6 +206,7 @@ fun QiblaScreen() {
                 colors = SwitchDefaults.colors(checkedTrackColor = Color.Red, checkedThumbColor = Color.White),
             )
         }
+    }
     }
 }
 
