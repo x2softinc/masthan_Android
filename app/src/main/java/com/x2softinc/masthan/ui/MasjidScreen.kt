@@ -126,7 +126,7 @@ private fun MasjidCard(info: MasjidInfo, isTablet: Boolean) {
     Card(
         shape = shape,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, AccentColor.copy(alpha = 0.2f)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -136,10 +136,10 @@ private fun MasjidCard(info: MasjidInfo, isTablet: Boolean) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(if (isTablet) 16.dp else 12.dp)) {
                 Box(
-                    Modifier.size(if (isTablet) 60.dp else 44.dp).clip(CircleShape).background(AccentColor.copy(alpha = 0.15f)),
+                    Modifier.size(if (isTablet) 60.dp else 44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Filled.Apartment, null, tint = AccentColor, modifier = Modifier.size(if (isTablet) 32.dp else 24.dp))
+                    Icon(Icons.Filled.Apartment, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(if (isTablet) 32.dp else 24.dp))
                 }
                 Text(
                     info.masjidName ?: "Unknown Masjid",
@@ -189,7 +189,7 @@ private fun String?.nonEmpty(): String? = this?.takeIf { it.isNotEmpty() }
 @Composable
 private fun InfoRow(icon: ImageVector, label: String, value: String, isTablet: Boolean) {
     Row(Modifier.padding(vertical = if (isTablet) 4.dp else 2.dp), horizontalArrangement = Arrangement.spacedBy(if (isTablet) 16.dp else 12.dp)) {
-        Icon(icon, null, tint = AccentColor, modifier = Modifier.size(if (isTablet) 24.dp else 20.dp))
+        Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(if (isTablet) 24.dp else 20.dp))
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(label, style = if (isTablet) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(value, style = if (isTablet) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.bodyMedium)

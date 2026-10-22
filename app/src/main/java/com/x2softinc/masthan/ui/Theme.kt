@@ -20,16 +20,13 @@ val BarBrush = androidx.compose.ui.graphics.Brush.horizontalGradient(
 /** Title / icon color on [BarColor]: dark brown, since white is unreadable on bright gold. */
 val BarContentColor = Color(0xFF2B1B00)
 
-/** Light "themeColor" (dark mode uses the label color, i.e. white). */
+/** Light-mode accent: bronze gold with enough contrast on white (dark mode uses a light gold). */
 private val ThemeGreen = Color(0xFF8F6420)
-
-/** Accent used by the Masjid and Prayer Settings cards. */
-val AccentColor = Color(0xFF8F6420)
 
 /** Soft gold used for Hijri accents. */
 val HijriGold = Color(0xFFEAD0A2)
 
-/** The iOS `Color("themeColor")` equivalent: dark green in light mode, white in dark mode. */
+/** The iOS `Color("themeColor")` equivalent: bronze gold in light mode, light gold in dark mode. */
 val androidx.compose.material3.ColorScheme.themeColor: Color get() = primary
 
 private val LightColors = lightColorScheme(
@@ -42,7 +39,7 @@ private val LightColors = lightColorScheme(
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Color.White,
+    primary = Color(0xFFE6C466),
     onPrimary = Color(0xFF3D2B00),
     secondary = Color(0xFFE6C466),
     background = Color(0xFF101312),
