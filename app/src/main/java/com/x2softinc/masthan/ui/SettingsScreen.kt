@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
@@ -287,6 +288,8 @@ fun SettingsScreen(onOpenAdhanSound: () -> Unit, onOpenTerms: () -> Unit, onOpen
                 ActionRow(Icons.Filled.ContentCopy, "Copy Support Information") {
                     copySupportInformation(context, appName, appVersion, buildNumber)
                 }
+                HorizontalDivider()
+                ActionRow(Icons.Filled.Email, "Contact Us") { openUrl(context, "mailto:support@x2softinc.com") }
                 HorizontalDivider()
                 ActionRow(Icons.Filled.Star, "Rate on Google Play") { openUrl(context, APP_URL) }
             }
