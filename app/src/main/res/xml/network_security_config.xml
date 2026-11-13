@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Equivalent of the iOS NSAppTransportSecurity exception for x2softinc.com
+     (the Masjid Pro API is served over plain HTTP). -->
+<network-security-config>
+    <!-- Sectigo Root R46 signs our server cert chain but is missing from older
+         Android trust stores; trust it in addition to the system roots. -->
+    <base-config>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/sectigo_root_r46" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">x2softinc.com</domain>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/sectigo_root_r46" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>
