@@ -21,11 +21,17 @@ else
 fi
 
 git -C "$CLONE" fetch --quiet origin
-HEAD_SHA="$(git -C "$CLONE" rev-parse origin/HEAD 2>/dev/null || git -C "$CLONE" rev-parse HEAD)"
+# origin/HEAD may be missing (e.g. a fresh shallow clone), so fall back to the usual default branches.
+HEAD_SHA=""
+for ref in origin/HEAD origin/main origin/master HEAD; do
+  if HEAD_SHA="$(git -C "$CLONE" rev-parse --verify -q "$ref")"; then break; fi
+  HEAD_SHA=""
+done
+[ -n "$HEAD_SHA" ] || { echo "Could not resolve the Masthan default branch" >&2; exit 1; }
 
 echo "Last synced : $LAST"
 echo "Masthan HEAD: $HEAD_SHA"
-if [ "$(git -C "$CLONE" rev-parse "$LAST")" = "$HEAD_SHA" ]; then
+if [ "$(git -C "$CLONE" rev-parse --verify -q "$LAST^{commit}")" = "$HEAD_SHA" ]; then
   echo "Already in sync."
   exit 0
 fi
